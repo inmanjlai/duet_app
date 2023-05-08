@@ -5,12 +5,7 @@ Duet is a productivity app built as a group-centered task management system. It 
 * JavaScript
 * HTML
 * CSS
-* Python
-* Flask
-* SQLAlchemy
-* PostgreSQL
-* Heroku
-* Websockets
+* PocketBase
 
 ## Main features
 
