@@ -26,6 +26,6 @@ Duet is a productivity app built as a group-centered task management system. It 
 
 ### Group Communication
 * Communication within the group is key
-* The group will have a websocketted chat feature for users to be able to communicate with one another for ease of access
+* The group will have a realtime chat feature for users to be able to communicate with one another for ease of access
 
 
