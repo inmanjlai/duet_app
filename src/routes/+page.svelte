@@ -13,12 +13,12 @@
             input[key] = value;
         }
 
-        data.groups = await pb.collection('groups').getList(1, 20, {filter: `name~"${input.search}"`})
+        data.groups = await pb.collection('groups').getList(1, 20, {filter: `name~"${input.search}" && private=false`})
     }
 
 
     function getGroups() {
-        return pb.collection('groups').getList(1, 20, { expand: 'users' });
+        return pb.collection('groups').getList(1, 20, { expand: 'users', filter: 'private=false' });
     }
 
     onMount(async() => {
