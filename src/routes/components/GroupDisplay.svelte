@@ -10,7 +10,13 @@
             {/if}
             {group.name}
         </h2>
-        <p>{group.description}</p>
+        <p>
+            {#if group.description.length > 100}
+                {group.description.slice(0, 100)}...
+            {:else}
+                {group.description}
+            {/if}
+        </p>
     </div>
 </a>
 
@@ -26,7 +32,7 @@
         position: relative;
         transition: transform 0.3s, box-shadow 0.3s;
         cursor: pointer;
-        height: 100%;
+        height: 200px;
     }
 
     div h2 span {
@@ -39,5 +45,12 @@
     div:hover {
         transform: translate(5px, -5px);
         box-shadow: -5px 5px 0px #2d2d2d50;
+    }
+
+    div p {
+        overflow: hidden;
+        max-width: 50ch;
+        max-height: 50ch;
+        text-overflow: ellipsis;
     }
 </style>

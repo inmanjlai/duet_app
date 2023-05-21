@@ -1,4 +1,4 @@
-import { pb } from '../../../lib/pocketbase'
+import { pb, currentUser } from '../../../lib/pocketbase'
 
 /** @type {import('./$types').PageLoad} */
 export function load({ params }) {
@@ -13,9 +13,19 @@ export function load({ params }) {
     }
     const tasks = getTasks();
 
+    const isMember = async() => {
+        try {
+            return await pb.collection('user_groups').getFirstListItem(`user_id="${currentUser.id}" && group_id="${group.id}"`)
+        } catch (err) {
+            return false;
+        }
+    }
+    const belongs = isMember();
+
     return {
         name: "Ismail Manjlai",
         group: group,
-        tasks: tasks
+        tasks: tasks,
+        belongs: belongs
     };
 }

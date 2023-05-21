@@ -2,6 +2,7 @@
     import { currentUser, pb } from "../../lib/pocketbase";
 
     export let task;
+    export let belongs;
     let checked;
     let task_title;
     task.completed_by_id !== "" ? checked = true : checked = false;
@@ -18,16 +19,27 @@
         })
     }
 
+    const deleteTask = async() => {
+        await pb.collection('tasks').delete(task.id)
+    }
+
 </script>
 
 <div>
     <p class="title" bind:this={task_title}>{task.title}</p>
-    {#if $currentUser}
+    {#if $currentUser && belongs}
+    <span class="controls">
+        <button on:click={deleteTask}>
+            <span class="material-symbols-rounded">
+                Delete
+            </span>
+        </button>
         <input 
             type="checkbox" 
             bind:checked={checked} 
             on:click={checked ? resetTask : completeTask}
         >
+    </span>
     {/if}
 </div>
 
@@ -44,13 +56,29 @@
         display: inline;
     }
 
-    input[type="checkbox"] {
+    .controls {
         position: absolute;
-        top: 12px;
+        top: 10px;
         right: 12px;
-        height: 30px;
-        width: 30px;
-        border: 2px solid #2d2d2d;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .controls button {
+        background-color: transparent;
+        border: none;
+    }
+
+    .controls button span {
+        font-size: 32px;
+        cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+        height: 25px;
+        width: 25px;
+        transform: translateY(-3px);
     }
 
     input[type="checkbox"]:checked  {

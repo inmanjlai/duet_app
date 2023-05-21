@@ -35,8 +35,10 @@
     main {
         display: grid;
         gap: 30px;
-        min-height: calc(100vh - 132px);
+        min-height: calc(100vh - 200px);
         place-items: center;
+        width: 100%;
+        max-width: 1150px;
     }
 
     form {

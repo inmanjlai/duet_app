@@ -7,13 +7,13 @@
 
     const findGroups = async(e) => {
         const formData = new FormData(e.target);
-        const search = {};
+        const input = {};
         for (let field of formData) {
             const [key, value] = field;
-            search[key] = value;
+            input[key] = value;
         }
 
-        data.groups = await pb.collection('groups').getList(1, 8, {filter: `name~"${search.search}"`})
+        data.groups = await pb.collection('groups').getList(1, 20, {filter: `name~"${input.search}"`})
     }
 
 
@@ -66,7 +66,7 @@
         max-width: 1150px;
         display: grid;
         grid-template-columns: 1fr 1fr 1fr 1fr;
-        grid-template-rows: 1fr;
+        grid-template-rows: 200px;
         gap: 15px;
     }
 
