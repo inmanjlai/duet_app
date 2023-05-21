@@ -6,7 +6,7 @@
     <div>
         <h2>
             {#if group.private}
-                <span class="material-symbols-rounded">lock</span>
+                <span class="material-symbols-rounded" title="private group">lock</span>
             {/if}
             {group.name}
         </h2>
@@ -22,7 +22,6 @@
         border: 2px solid #2d2d2d;
         border-radius: 5px;
         padding: 15px;
-        box-shadow: 0 5px 10px #2d2d2d20;
         background-color: white;
         position: relative;
         transition: transform 0.3s, box-shadow 0.3s;
@@ -34,10 +33,11 @@
         position: absolute;
         bottom: 10px;
         right: 10px;
+        color: #2d2d2d50;
     }
 
     div:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 10px 15px #2d2d2d10;
+        transform: translate(5px, -5px);
+        box-shadow: -5px 5px 0px #2d2d2d50;
     }
 </style>

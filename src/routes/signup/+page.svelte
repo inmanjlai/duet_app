@@ -9,7 +9,7 @@
             const [key, value] = field;
             data[key] = value;
         }
-        
+
         await pb.collection('users').create(data);
         await pb.collection('users').authWithPassword(data.username, data.password);
         goto('/');
@@ -23,19 +23,19 @@
         <form on:submit|preventDefault={signup}>
             <h1>Sign up</h1>
             <label for="name">full name</label>
-            <input type="text" name="name" placeholder="full name" required>
+            <input type="text" name="name" placeholder="full name" autocomplete="name" required>
 
             <label for="username">username</label>
-            <input type="text" name="username" placeholder="username" required>
+            <input type="text" name="username" placeholder="username" autocomplete="username" required>
 
             <label for="email">email</label>
-            <input type="email" name="email" placeholder="email" required>
+            <input type="email" name="email" placeholder="email" autocomplete="email" required>
 
             <label for="password">password</label>
-            <input type="password" name="password" placeholder="password" required>
+            <input type="password" name="password" placeholder="password" autocomplete="new-password" required>
 
             <label for="passwordConfirm">confirm password</label>
-            <input type="password" name="passwordConfirm" placeholder="confirm password" required>
+            <input type="password" name="passwordConfirm" placeholder="confirm password" autocomplete="new-password" required>
 
             <button>Sign up</button>
             <a href="/login">Already signed up? Log in</a>
@@ -54,13 +54,13 @@
     form {
         display: flex;
         flex-direction: column;
-        gap: 15px;
+        gap: 10px;
         border: 2px solid #2d2d2d;
         padding: 30px;
         border-radius: 10px;
         background-color: white;
         box-shadow: 0 5px 10px #2d2d2d20;
-        width: 50%;            
+        width: 50%;
         max-width: 800px;
         transition: 0.3s;
     }

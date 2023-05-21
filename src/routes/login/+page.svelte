@@ -9,7 +9,7 @@
             const [key, value] = field;
             data[key] = value;
         }
-        
+
         await pb.collection('users').authWithPassword(data.username, data.password);
         goto('/')
     }
@@ -22,9 +22,9 @@
         <form on:submit|preventDefault={login}>
             <h1>Login</h1>
             <label for="username">username</label>
-            <input type="text" name="username" placeholder="username" required>
+            <input type="text" name="username" placeholder="username" autocomplete="username" required>
             <label for="password">password</label>
-            <input type="password" name="password" placeholder="password" required>
+            <input type="password" name="password" placeholder="password" autocomplete="current-password" required>
             <button>Login</button>
             <a href="/signup">Don't have an account? Sign up</a>
         </form>
@@ -42,13 +42,13 @@
     form {
         display: flex;
         flex-direction: column;
-        gap: 15px;
+        gap: 10px;
         border: 2px solid #2d2d2d;
         padding: 30px;
         border-radius: 10px;
         background-color: white;
         box-shadow: 0 5px 10px #2d2d2d20;
-        width: 50%;            
+        width: 50%;
         max-width: 800px;
         transition: 0.3s;
     }

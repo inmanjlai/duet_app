@@ -1,18 +1,37 @@
 <script>
+    import { onDestroy, onMount } from "svelte";
+    import { pb } from "../lib/pocketbase";
     import GroupDisplay from "./components/GroupDisplay.svelte";
+
+    export let data;
 
     const findGroups = async(e) => {
         const formData = new FormData(e.target);
-        const data = {};
+        const search = {};
         for (let field of formData) {
             const [key, value] = field;
-            data[key] = value;
+            search[key] = value;
         }
 
-        console.log(data);
+        data.groups = await pb.collection('groups').getList(1, 8, {filter: `name~"${search.search}"`})
     }
 
-    export let data;
+
+    function getGroups() {
+        return pb.collection('groups').getList(1, 20, { expand: 'users' });
+    }
+
+    onMount(async() => {
+        pb.collection('groups').subscribe('*', async(e) => {
+            data.groups = await getGroups();
+        })
+
+    })
+
+    onDestroy(() => {
+        pb.collection('groups').unsubscribe('*');
+    })
+
 </script>
 
 <main>
@@ -24,7 +43,7 @@
             </span>
         </button>
     </form>
-    <h1>Top Groups</h1>
+    <h1>Groups</h1>
     <div class="groups-container">
         {#each data.groups.items as group}
             <GroupDisplay group={group} />
@@ -41,8 +60,9 @@
         gap: 50px;
         align-items: center;
     }
-    
+
     .groups-container {
+        width: 100%;
         max-width: 1150px;
         display: grid;
         grid-template-columns: 1fr 1fr 1fr 1fr;
