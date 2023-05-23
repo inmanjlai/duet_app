@@ -14,24 +14,15 @@ export function load({ params }) {
     const tasks = getTasks();
 
     const getUserGroups = async() => {
-        return await pb.collection('user_groups').getFullList({filter: `group_id = "${params.id}"`})
+        return await pb.collection('user_groups')
+            .getFirstListItem(`group_id = "${params.id}"`)
     }
 
     const userGroups = getUserGroups();
 
-    const isMember = async() => {
-        try {
-            return await pb.collection('user_groups').getFirstListItem(`user_id="${currentUser.id}" && group_id="${group.id}"`)
-        } catch (err) {
-            return false;
-        }
-    }
-    const belongs = isMember();
-
     return {
         group: group,
         tasks: tasks,
-        userGroups: userGroups,
-        belongs: belongs
+        userGroups: userGroups
     };
 }

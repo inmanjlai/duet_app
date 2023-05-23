@@ -11,30 +11,23 @@
     let modal;
     let deleteModal;
     let editModal;
+    let belongs;
 
-    const isMember = async() => {
-        let results;
-        
-        try {
-            results = await pb.collection('user_groups')
-            .getFirstListItem(`user_id="${$currentUser.id}" && group_id="${group.id}"`);
-            
-            return results;
-        } catch (err) {
-            return false;
-        }
-        
-    }
+    const set = new Set(data.userGroups?.user_id);
+    if (set.has($currentUser?.id)) belongs = true
+    else belongs = false;
     
     const joinGroup = async() => {
-        const belongsToGroup = await isMember();
-        
-        if(belongsToGroup) {
-            pb.collection('user_groups').delete(belongsToGroup.id)
-            data.belongs = false;
-        } else {
-            pb.collection('user_groups').create({user_id: `${$currentUser.id}`, group_id: `${group.id}`})
-            data.belongs = true;
+        if(belongs) {
+            pb.collection('user_groups').update(data.userGroups.id, {
+                user_id: data.userGroups.user_id.filter((user) => user !== $currentUser.id)
+            })
+            belongs = false;
+        } else {            
+            pb.collection('user_groups').update(data.userGroups.id, {
+                user_id: [...data.userGroups.user_id, $currentUser.id]
+            })
+            belongs = true;
         }
     }
 
@@ -67,11 +60,11 @@
         
         pb.collection('user_groups').subscribe('*', async(e) => {
             if (e.action == 'create') {
-                data.userGroups = [...data.userGroups, e.record]
+                data.userGroups = e.record
             }
 
-            if (e.action == 'delete') {
-                data.userGroups = data.userGroups.filter((userGroup) => userGroup.id !== e.record.id)
+            if (e.action == 'update') {
+                data.userGroups = e.record
             }
         })
 
@@ -97,12 +90,6 @@
             }
         })
 
-        if (await isMember()) {
-            data.belongs = true;
-        } else {
-            data.belongs = false;
-        }
-
     })
 
     onDestroy(() => {
@@ -117,6 +104,7 @@
             <h1>{group.name}</h1>
             <p>{group.description}</p>
             <p class="owner-p">Owned by <span class="owner">{group.expand?.owner_id?.username}</span></p>
+            <p>{data.userGroups?.user_id?.length} members</p>
         </div>
         <div>
             {#if $currentUser}
@@ -126,7 +114,7 @@
                 <button on:click={() => editModal.showModal()}>Edit Group</button>
                 {/if}
                 <button on:click={joinGroup}>
-                    {#if data.belongs}
+                    {#if belongs}
                     Leave Group
                     {:else}
                     Join Group
@@ -139,7 +127,7 @@
 
     <div>
         <h2 class="task-h2">Tasks 
-            {#if $currentUser && data.belongs}
+            {#if $currentUser && group.owner_id === $currentUser.id}
                 <button class="add-task" on:click={() => modal.showModal()}>
                     <span class="material-symbols-rounded">Add</span> 
                 </button>
@@ -147,7 +135,7 @@
         </h2>
         <div class="tasks-container">
             {#each data.tasks as task}
-                <Task task={task} belongs={data.belongs} />
+                <Task task={task} belongs={belongs} />
             {/each}
         </div>
     </div>
