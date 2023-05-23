@@ -54,7 +54,8 @@
 
 <style>
     main {
-        padding: 30px;
+        width: 100%;
+        /* padding: 30px; */
         display: flex;
         flex-direction: column;
         gap: 50px;
@@ -106,7 +107,21 @@
         /* transform: translateY(3px); */
     }
 
-    @media screen and (max-width: 650px) {
+    @media screen and (max-width: 1000px) {
+        .groups-container {
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: auto;
+        }
+    }
+
+    @media screen and (max-width: 800px) {
+        .groups-container {
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto;
+        }
+    }
+
+    @media screen and (max-width: 550px) {
         .groups-container {
             grid-template-columns: 1fr;
             grid-template-rows: auto;

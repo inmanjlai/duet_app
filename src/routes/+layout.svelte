@@ -11,11 +11,13 @@
         </div>
         <ul>
             {#if $currentUser}
-                <p>Logged in as {$currentUser.username}</p>
+            <p>Logged in as <a href="/users/{$currentUser.id}"><strong>{$currentUser.username}</strong></a></p>
+            <div class="user-controls">               
                 <button on:click={() => modal.showModal()} class="secondary" title="create group">
                     <span class="material-symbols-rounded">Add</span>
                 </button>
                 <button on:click={() => pb.authStore.clear()}>Logout</button>
+            </div>
             {:else}
                 <li><a href="/login">Login</a></li>
                 <li><a href="/signup">Sign up</a></li>
@@ -94,6 +96,11 @@
         align-items: center;
         transition: transform 0.3s, box-shadow 0.3s;
     }
+    
+    .user-controls {
+        display: flex;
+        gap: 15px;        
+    }
 
     .secondary {
         background-color: white;
@@ -104,6 +111,11 @@
     ul button:hover {
         transform: translate(5px, -5px);
         box-shadow: -5px 5px 0px #2d2d2d50;
+    }
+
+    ul p {
+        width: max-content;
+        flex-grow: 1;
     }
 
     dialog {
@@ -131,17 +143,18 @@
         align-items: center;
     }
 
-    @media screen and (max-width: 650px) {
+    @media screen and (max-width: 670px) {
         nav {
             flex-direction: column;
             gap: 30px;
         }
 
-        nav ul p {
-            display: none;
+        nav ul {
+            width: 100%;
+            flex-direction: column;
         }
 
-        nav ul {
+        .user-controls {
             width: 100%;
         }
 

@@ -23,7 +23,6 @@ export function load({ params }) {
     const belongs = isMember();
 
     return {
-        name: "Ismail Manjlai",
         group: group,
         tasks: tasks,
         belongs: belongs

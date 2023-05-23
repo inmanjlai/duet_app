@@ -73,6 +73,7 @@
     .controls button span {
         font-size: 32px;
         cursor: pointer;
+        color: #2d2d2d;
     }
 
     input[type="checkbox"] {

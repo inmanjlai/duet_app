@@ -1,41 +1,41 @@
 <script>
     import { currentUser, pb } from "../../lib/pocketbase";
-    import { goto } from '$app/navigation'
-
 
     export let modal;
+    export let currentGroupData;
+    let isChecked = currentGroupData.private;
 
-    const createGroup = async(e) => {
+    const editGroup = async(e) => {
         const formData = new FormData(e.target);
-        let data = {
-            owner_id: $currentUser.id
-        }
 
+        
+        let data = {
+            owner_id: $currentUser.id,
+            private: isChecked
+        }
+        
         for (let field of formData) {
             let [key, value] = field;
             data[key] = value;
         }
+        
+        console.log(data)
 
         if (data.private == "on") data.private = true
 
-        await pb.collection('groups').create(data);
+        await pb.collection('groups').update(currentGroupData.id, data);
         
-        const madeGroup = await pb.collection('groups').getFirstListItem(`name="${data.name}"`);
-        await pb.collection('user_groups').create({user_id: `${$currentUser.id}`, group_id: `${madeGroup.id}`})
-        goto(`/groups/${madeGroup.id}`);
-
-        e.target.reset();
         modal.close();
     }
 </script>
 
-<form on:submit|preventDefault={createGroup}>
-    <h1>Create Group</h1>
+<form on:submit|preventDefault={editGroup}>
+    <h1>Edit Group</h1>
     <label for="name">name</label>
-    <input type="text" name="name" id="name" placeholder="name">
+    <input type="text" name="name" id="name" placeholder="name" value="{currentGroupData.name}">
 
     <label for="group-description">description</label>
-    <textarea name="description" id="group-description" cols="30" rows="4" placeholder="description"></textarea>
+    <textarea name="description" id="group-description" cols="30" rows="4" placeholder="description" value={currentGroupData.description}></textarea>
 
     <div>
         <label for="slider">
@@ -44,15 +44,23 @@
             </span>
             Private Group</label>
         <label class="switch">
-            <input id="slider" name='private' type="checkbox">
+            <input id="slider" name='private' type="checkbox" 
+                bind:checked={isChecked}
+                on:change={(e) => isChecked = e.target.checked}
+            >
             <span class="slider round"></span>
         </label>
     </div>
 
-    <button>Create</button>
+    <button type="button" class="secondary" on:click={() => modal.close()}>Cancel</button>
+    <button>Confirm Changes</button>
 </form>
 
 <style>
+    .secondary {
+        background-color: #2d2d2d50;
+    }
+
     form {
         display: flex;
         flex-direction: column;

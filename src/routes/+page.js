@@ -9,7 +9,6 @@ export function load({ params }) {
     const groups = getGroups();
 
     return {
-        name: "Ismail Manjlai",
         groups: groups
     };
 }

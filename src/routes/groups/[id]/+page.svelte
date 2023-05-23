@@ -2,10 +2,15 @@
     import { currentUser, pb } from "../../../lib/pocketbase";
     import { onMount, onDestroy } from "svelte";
     import Task from "../../components/Task.svelte";
+    import { goto } from '$app/navigation'
+    import EditGroupDialog from "../../components/EditGroupDialog.svelte";
 
     export let data;
-    const group = data.group;
+    let group = data.group;
+    
     let modal;
+    let deleteModal;
+    let editModal;
 
     const isMember = async() => {
         let results;
@@ -33,6 +38,15 @@
         }
     }
 
+    const deleteGroup = async() => {    
+        await pb.collection('groups').delete(group.id);
+        goto('/')
+    }
+
+    const editGroup = async() => {
+        console.log('edit group')
+    }
+
     const createTask = async(e) => {
         const formData = new FormData(e.target)
         let data = {}
@@ -44,18 +58,27 @@
         data.group_id = group.id
 
         await pb.collection('tasks').create(data)
+        e.target.reset();
         modal.close();
-
-    }
-
-    function getTasks() {
-        return pb.collection('tasks').getFullList({filter: `group_id = '${group.id}'`, expand: 'completed_by_id'})
-
     }
 
     onMount(async() => {
+        pb.collection('groups').subscribe('*', async(e) => {
+            const owner_id = await pb.collection('users').getOne(e.record.owner_id);
+            e.record.expand = {owner_id}
+            group = e.record;
+            console.log(group)
+        })
+
         pb.collection('tasks').subscribe('*', async(e) => {
-            data.tasks = await getTasks();
+            if (e.action == 'create') {
+                const completed_by_id = await pb.collection('users').getOne(e.record.completed_by_id);
+                e.record.expand = {completed_by_id}
+                data.tasks = [...data.tasks, e.record]
+            }
+            if (e.action == 'delete') {
+                data.tasks = data.tasks.filter((task) => task.id !== e.record.id)
+            }
         })
 
         if (await isMember()) {
@@ -68,8 +91,8 @@
 
     onDestroy(() => {
         pb.collection('tasks').unsubscribe('*');
+        pb.collection('groups').unsubscribe('*');
     })
-
 </script>
 
 <main>
@@ -81,6 +104,11 @@
         </div>
         <div>
             {#if $currentUser}
+            <div class="group-controls">
+                {#if $currentUser && $currentUser.id == group.owner_id}
+                <button on:click={() => deleteModal.showModal()}>Delete Group</button>
+                <button on:click={() => editModal.showModal()}>Edit Group</button>
+                {/if}
                 <button on:click={joinGroup}>
                     {#if data.belongs}
                     Leave Group
@@ -88,6 +116,7 @@
                     Join Group
                     {/if}
                 </button>
+            </div>
             {/if}
         </div>
     </div>
@@ -119,7 +148,28 @@
     </form>
 </dialog>
 
+<dialog bind:this={deleteModal} class="delete-modal">
+    <h1>Delete Group?</h1>
+    <div class="delete-modal-controls">
+        <button on:click={() => deleteModal.close()} class="secondary">Cancel</button>
+        <button on:click={deleteGroup}>Confirm</button>
+    </div>
+</dialog>
+
+<dialog bind:this={editModal}>
+    <EditGroupDialog currentGroupData={group} modal={editModal} />
+</dialog>
+
 <style>
+    .delete-modal h1 {
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    .delete-modal-controls {
+        display: flex;
+        gap: 15px;
+    }
 
     main {
         width: 100%;
@@ -129,8 +179,15 @@
         gap: 30px;
     }
 
+    .group-controls {
+        display: flex;
+        gap: 15px;
+    }
+
     .header {
         display: flex;
+        flex-direction: column;
+        gap: 30px;
         justify-content: space-between;
     }
     
@@ -226,6 +283,16 @@
 
     .secondary {
         background-color: #2d2d2d80;
+    }
+
+    @media screen and (max-width: 670px) {
+        .group-controls {
+            width: 100%;
+        }
+
+        .group-controls button{
+            flex-grow: 1;
+        }
     }
 
 </style>
