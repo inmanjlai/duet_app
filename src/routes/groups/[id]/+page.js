@@ -9,9 +9,15 @@ export function load({ params }) {
     const group = getGroup();
 
     const getTasks = async() => {
-        return await pb.collection('tasks').getFullList({filter: `group_id = '${params.id}'`, expand: 'completed_by_id'})
+        return await pb.collection('tasks').getFullList({filter: `group_id = '${params.id}'`, expand: 'completed_by_id,group_id'})
     }
     const tasks = getTasks();
+
+    const getUserGroups = async() => {
+        return await pb.collection('user_groups').getFullList({filter: `group_id = "${params.id}"`})
+    }
+
+    const userGroups = getUserGroups();
 
     const isMember = async() => {
         try {
@@ -25,6 +31,7 @@ export function load({ params }) {
     return {
         group: group,
         tasks: tasks,
+        userGroups: userGroups,
         belongs: belongs
     };
 }

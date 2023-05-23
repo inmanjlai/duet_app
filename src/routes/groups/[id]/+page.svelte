@@ -7,7 +7,7 @@
 
     export let data;
     let group = data.group;
-    
+
     let modal;
     let deleteModal;
     let editModal;
@@ -43,10 +43,6 @@
         goto('/')
     }
 
-    const editGroup = async() => {
-        console.log('edit group')
-    }
-
     const createTask = async(e) => {
         const formData = new FormData(e.target)
         let data = {}
@@ -67,15 +63,35 @@
             const owner_id = await pb.collection('users').getOne(e.record.owner_id);
             e.record.expand = {owner_id}
             group = e.record;
-            console.log(group)
+        })
+        
+        pb.collection('user_groups').subscribe('*', async(e) => {
+            if (e.action == 'create') {
+                data.userGroups = [...data.userGroups, e.record]
+            }
+
+            if (e.action == 'delete') {
+                data.userGroups = data.userGroups.filter((userGroup) => userGroup.id !== e.record.id)
+            }
         })
 
         pb.collection('tasks').subscribe('*', async(e) => {
             if (e.action == 'create') {
                 const completed_by_id = await pb.collection('users').getOne(e.record.completed_by_id);
                 e.record.expand = {completed_by_id}
+                const group_id = await pb.collection('groups').getOne(e.record.group_id);
+                e.record.expand = {group_id}
                 data.tasks = [...data.tasks, e.record]
             }
+           
+            if (e.action == 'update') {
+                const group_id = await pb.collection('groups').getOne(e.record.group_id);
+                e.record.expand = {group_id}
+                let taskToReplace = data.tasks.find((task) => task.id === e.record.id);
+                let idx = data.tasks.indexOf(taskToReplace)
+                data.tasks[idx] = e.record
+            }
+
             if (e.action == 'delete') {
                 data.tasks = data.tasks.filter((task) => task.id !== e.record.id)
             }
@@ -131,7 +147,7 @@
         </h2>
         <div class="tasks-container">
             {#each data.tasks as task}
-                <Task task={task} belongs={data.belongs}/>
+                <Task task={task} belongs={data.belongs} />
             {/each}
         </div>
     </div>
