@@ -80,13 +80,7 @@
         })
         
         pb.collection('user_groups').subscribe('*', async(e) => {
-            if (e.action == 'create') {
-                data.userGroups = e.record
-            }
-
-            if (e.action == 'update') {
-                data.userGroups = e.record
-            }
+            data.userGroups = await pb.collection('user_groups').getFirstListItem(`group_id="${group.id}"`, {expand: "user_id"})
         })
 
         pb.collection('tasks').subscribe('*', async(e) => {
@@ -116,6 +110,7 @@
     onDestroy(() => {
         pb.collection('tasks').unsubscribe('*');
         pb.collection('groups').unsubscribe('*');
+        pb.collection('user_groups').unsubscribe('*');
     })
 </script>
 
@@ -172,8 +167,16 @@
             <p>Messages</p>
         </div>
 
-        <div class="members">
-            <p>Group Members</p>
+        <div class="member-list">
+            <div class="members">
+
+                {#each data.userGroups?.expand?.user_id as member}
+                <div class="member-div">
+                    <p>{member.username}</p>
+                    <p>{member.name}</p>
+                </div>
+                {/each}
+            </div>
         </div>
     </div>
 </main>
@@ -205,12 +208,13 @@
     .tab-buttons {
         display: flex;
         border-bottom: 2px solid #2d2d2d;
+        gap: 15px;
     }
 
     .comm-container {
         padding: 0px 30px;
         display: grid;
-        grid-template-columns: 2fr 1fr;
+        grid-template-columns: 3fr 1fr;
         grid-template-rows: 1fr;
     }
 
@@ -220,12 +224,12 @@
 
     #tab {
         border: none;
-        background-color: transparent;
+        background-color: #2d2d2d20;
         color: #2d2d2d;
-        border: 2px solid transparent;
+        border: 2px solid #2d2d2d;
         border-bottom: 1px solid transparent;
         cursor: pointer;
-        padding: 10px 30px 20px 30px;
+        padding: 10px 30px 10px 30px;
         border-radius: 5px 5px 0 0;
         transform: translateY(2px);
     }
@@ -239,6 +243,32 @@
         border: 2px solid #2d2d2d;
         border-bottom: 1px solid ghostwhite;
         background-color: ghostwhite;
+    }
+
+    .members {
+        display: flex;
+        flex-direction: column;
+        background-color: white;
+        border: 2px solid #2d2d2d;
+        border-radius: 5px;
+    }
+
+    .member-div:not(:last-child) {
+        border-bottom: 2px solid #2d2d2d;
+    }
+
+    .member-div {
+        padding: 15px;
+        transition: background-color 0.3s;
+    }
+
+    .member-div:hover {
+        background-color: #2d2d2d20;
+    }
+
+    .member-div p:first-child {
+        font-weight: 700;
+        font-size: large;
     }
     
     .delete-modal h1 {
@@ -262,6 +292,10 @@
     .group-controls {
         display: flex;
         gap: 15px;
+    }
+
+    .group-controls > button {
+        min-width: 80px;
     }
 
     .header {
@@ -378,6 +412,10 @@
 
         .group-controls button{
             flex-grow: 1;
+        }
+
+        .member-list {
+            display: none;
         }
     }
 

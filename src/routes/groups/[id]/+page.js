@@ -15,7 +15,7 @@ export function load({ params }) {
 
     const getUserGroups = async() => {
         return await pb.collection('user_groups')
-            .getFirstListItem(`group_id = "${params.id}"`)
+            .getFirstListItem(`group_id = "${params.id}"`, {expand: 'user_id'})
     }
 
     const userGroups = getUserGroups();

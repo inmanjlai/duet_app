@@ -19,8 +19,6 @@
             data[key] = value;
         }
         
-        console.log(data)
-
         if (data.private == "on") data.private = true
 
         await pb.collection('groups').update(currentGroupData.id, data);
