@@ -13,7 +13,8 @@
     function getUserGroups() {
         return pb.collection('user_groups')
             .getList(1, 200, {
-                expand: 'group_id' , filter: `user_id='${$currentUser.id}'`
+                expand: 'group_id' , 
+                filter: `user_id~'${$currentUser.id}'`
             })
     }
 
@@ -55,6 +56,7 @@
         display: flex;
         flex-direction: column;
         gap: 50px;
+        padding: 30px;
     }
 
     h1 {

@@ -49,14 +49,14 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 30px;
+        /* padding: 30px; */
     }
 
     header {
         width: 100%;
         display: flex;
         justify-content: center;
-        padding: 30px;
+        padding: 30px 0px;
     }
 
     nav {
@@ -65,6 +65,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        padding: 0px 30px;
     }
 
     .logo {

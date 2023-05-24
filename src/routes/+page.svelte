@@ -60,6 +60,7 @@
         flex-direction: column;
         gap: 50px;
         align-items: center;
+        padding: 30px;
     }
 
     .groups-container {

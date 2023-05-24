@@ -10,7 +10,7 @@ export function load({ params }) {
 
     const getUserGroups = async() => {
         return await pb.collection('user_groups')
-            .getList(1, 200, {expand: 'group_id' , filter: `user_id='${params.id}'`})
+            .getList(1, 200, {expand: 'group_id' , filter: `user_id~'${params.id}'`})
     }
     const userGroups = getUserGroups();
 

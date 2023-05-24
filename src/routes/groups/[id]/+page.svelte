@@ -12,6 +12,10 @@
     let deleteModal;
     let editModal;
     let belongs;
+    let taskButton;
+    let commButton;
+    let taskContainer;
+    let commContainer;
 
     const set = new Set(data.userGroups?.user_id);
     if (set.has($currentUser?.id)) belongs = true
@@ -49,6 +53,23 @@
         await pb.collection('tasks').create(data)
         e.target.reset();
         modal.close();
+    }
+
+    const openTasks = () => {
+        commButton.classList.remove('active')
+        commContainer.classList.add('hide')
+
+        taskContainer.classList.remove('hide')
+        taskButton.classList.add('active')
+
+    }
+
+    const openComm = () => {
+        taskButton.classList.remove('active')
+        taskContainer.classList.add('hide')
+
+        commContainer.classList.remove('hide')
+        commButton.classList.add('active')
     }
 
     onMount(async() => {
@@ -110,24 +131,30 @@
             {#if $currentUser}
             <div class="group-controls">
                 {#if $currentUser && $currentUser.id == group.owner_id}
-                <button on:click={() => deleteModal.showModal()}>Delete Group</button>
-                <button on:click={() => editModal.showModal()}>Edit Group</button>
+                <button on:click={() => deleteModal.showModal()}>Delete</button>
+                <button on:click={() => editModal.showModal()}>Edit</button>
                 {/if}
                 <button on:click={joinGroup}>
                     {#if belongs}
-                    Leave Group
+                    Leave
                     {:else}
-                    Join Group
+                    Join
                     {/if}
                 </button>
             </div>
             {/if}
         </div>
     </div>
+    
+    <div class="tab-buttons">
+        <button bind:this={taskButton} on:click={openTasks} class="active" id="tab"><h2>Tasks</h2></button>
+        <button bind:this={commButton} on:click={openComm}  id="tab"><h2>Community</h2></button>
+    </div>
 
-    <div>
-        <h2 class="task-h2">Tasks 
+    <div bind:this={taskContainer}>
+        <h2 class="task-h2">
             {#if $currentUser && group.owner_id === $currentUser.id}
+                Create Task
                 <button class="add-task" on:click={() => modal.showModal()}>
                     <span class="material-symbols-rounded">Add</span> 
                 </button>
@@ -137,6 +164,16 @@
             {#each data.tasks as task}
                 <Task task={task} belongs={belongs} />
             {/each}
+        </div>
+    </div>
+
+    <div class="hide comm-container" bind:this={commContainer}>
+        <div class="messages">
+            <p>Messages</p>
+        </div>
+
+        <div class="members">
+            <p>Group Members</p>
         </div>
     </div>
 </main>
@@ -165,6 +202,45 @@
 </dialog>
 
 <style>
+    .tab-buttons {
+        display: flex;
+        border-bottom: 2px solid #2d2d2d;
+    }
+
+    .comm-container {
+        padding: 0px 30px;
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        grid-template-rows: 1fr;
+    }
+
+    #tab:first-child {
+        margin-left: 30px;
+    }
+
+    #tab {
+        border: none;
+        background-color: transparent;
+        color: #2d2d2d;
+        border: 2px solid transparent;
+        border-bottom: 1px solid transparent;
+        cursor: pointer;
+        padding: 10px 30px 20px 30px;
+        border-radius: 5px 5px 0 0;
+        transform: translateY(2px);
+    }
+
+    #tab:hover {
+        transform: translate(0, 2px);
+        box-shadow: none;
+    }
+    
+    #tab.active {
+        border: 2px solid #2d2d2d;
+        border-bottom: 1px solid ghostwhite;
+        background-color: ghostwhite;
+    }
+    
     .delete-modal h1 {
         margin-bottom: 15px;
         text-align: center;
@@ -193,6 +269,7 @@
         flex-direction: column;
         gap: 30px;
         justify-content: space-between;
+        padding: 30px;
     }
     
     .header button {
@@ -222,10 +299,10 @@
     }
 
     .tasks-container {
-        margin-top: 30px;
         display: flex;
         flex-direction: column;
         gap: 15px;
+        padding: 30px;
     }
 
     .add-task {
@@ -237,6 +314,7 @@
         display: flex;
         align-items: center;
         gap: 15px;
+        padding: 0px 30px;
     }
 
     .task-h2 span {
@@ -287,6 +365,10 @@
 
     .secondary {
         background-color: #2d2d2d80;
+    }
+
+    div.hide {
+        display: none;
     }
 
     @media screen and (max-width: 670px) {
