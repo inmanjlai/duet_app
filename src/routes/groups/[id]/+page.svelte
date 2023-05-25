@@ -20,14 +20,14 @@
     const set = new Set(data.userGroups?.user_id);
     if (set.has($currentUser?.id)) belongs = true
     else belongs = false;
-    
+
     const joinGroup = async() => {
         if(belongs) {
             pb.collection('user_groups').update(data.userGroups.id, {
                 user_id: data.userGroups.user_id.filter((user) => user !== $currentUser.id)
             })
             belongs = false;
-        } else {            
+        } else {
             pb.collection('user_groups').update(data.userGroups.id, {
                 user_id: [...data.userGroups.user_id, $currentUser.id]
             })
@@ -35,7 +35,7 @@
         }
     }
 
-    const deleteGroup = async() => {    
+    const deleteGroup = async() => {
         await pb.collection('groups').delete(group.id);
         goto('/')
     }
@@ -78,7 +78,7 @@
             e.record.expand = {owner_id}
             group = e.record;
         })
-        
+
         pb.collection('user_groups').subscribe('*', async(e) => {
             data.userGroups = await pb.collection('user_groups').getFirstListItem(`group_id="${group.id}"`, {expand: "user_id"})
         })
@@ -91,7 +91,7 @@
                 e.record.expand = {group_id}
                 data.tasks = [...data.tasks, e.record]
             }
-           
+
             if (e.action == 'update') {
                 const group_id = await pb.collection('groups').getOne(e.record.group_id);
                 e.record.expand = {group_id}
@@ -140,18 +140,18 @@
             {/if}
         </div>
     </div>
-    
+
     <div class="tab-buttons">
         <button bind:this={taskButton} on:click={openTasks} class="active" id="tab"><h2>Tasks</h2></button>
         <button bind:this={commButton} on:click={openComm}  id="tab"><h2>Community</h2></button>
     </div>
 
-    <div bind:this={taskContainer}>
+    <div bind:this={taskContainer} class="tasks-container-wrapper">
         <h2 class="task-h2">
             {#if $currentUser && group.owner_id === $currentUser.id}
                 Create Task
                 <button class="add-task" on:click={() => modal.showModal()}>
-                    <span class="material-symbols-rounded">Add</span> 
+                    <span class="material-symbols-rounded">Add</span>
                 </button>
             {/if}
         </h2>
@@ -187,8 +187,8 @@
         <input type="text" name="title" placeholder="task">
         <div>
             <button  class="secondary" type="button" on:click={() => modal.close()}>Cancel</button>
-            <button>Add Task</button> 
-        </div>   
+            <button>Add Task</button>
+        </div>
     </form>
 </dialog>
 
@@ -205,6 +205,13 @@
 </dialog>
 
 <style>
+    .tasks-container-wrapper {
+        background-color: #2d2d2d20;
+        border: 2px solid #2d2d2d;
+        border-top: none;
+        border-radius: 0 0 5px 5px;
+    }
+
     .tab-buttons {
         display: flex;
         border-bottom: 2px solid #2d2d2d;
@@ -212,7 +219,11 @@
     }
 
     .comm-container {
-        padding: 0px 30px;
+        background-color: #2d2d2d20;
+        border: 2px solid #2d2d2d;
+        border-top: none;
+        border-radius: 0 0 5px 5px;
+        padding: 30px;
         display: grid;
         grid-template-columns: 3fr 1fr;
         grid-template-rows: 1fr;
@@ -224,8 +235,7 @@
 
     #tab {
         border: none;
-        background-color: #2d2d2d20;
-        color: #2d2d2d;
+        background-color: #2d2d2d30;
         border: 2px solid #2d2d2d;
         border-bottom: 1px solid transparent;
         cursor: pointer;
@@ -234,15 +244,19 @@
         transform: translateY(2px);
     }
 
+    #tab h2 {
+        font-weight: 500;
+    }
+
     #tab:hover {
         transform: translate(0, 2px);
         box-shadow: none;
     }
-    
+
     #tab.active {
         border: 2px solid #2d2d2d;
-        border-bottom: 1px solid ghostwhite;
-        background-color: ghostwhite;
+        border-bottom: 1px solid #DFDFE4;
+        background-color: #DFDFE4;
     }
 
     .members {
@@ -270,7 +284,7 @@
         font-weight: 700;
         font-size: large;
     }
-    
+
     .delete-modal h1 {
         margin-bottom: 15px;
         text-align: center;
@@ -286,7 +300,6 @@
         max-width: 1150px;
         display: flex;
         flex-direction: column;
-        gap: 30px;
     }
 
     .group-controls {
@@ -305,7 +318,7 @@
         justify-content: space-between;
         padding: 30px;
     }
-    
+
     .header button {
         padding: 10px;
         border: none;
@@ -348,7 +361,7 @@
         display: flex;
         align-items: center;
         gap: 15px;
-        padding: 0px 30px;
+        padding: 30px 30px 0 30px;
     }
 
     .task-h2 span {
@@ -403,6 +416,14 @@
 
     div.hide {
         display: none;
+    }
+
+    @media screen and (max-width: 1150px) {
+        .tasks-container-wrapper, .comm-container {
+            border-left: none;
+            border-right: none;
+            border-radius: 0;
+        }
     }
 
     @media screen and (max-width: 670px) {
